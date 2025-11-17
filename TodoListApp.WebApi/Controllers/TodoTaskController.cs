@@ -6,7 +6,7 @@ using TodoListApp.Services.Interfaces;
 namespace TodoListApp.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/task")]
 public class TodoTaskController : ControllerBase
 {
     private readonly ITodoTaskService _todoTaskService;
@@ -16,7 +16,7 @@ public class TodoTaskController : ControllerBase
         this._todoTaskService = todoTaskservice ?? throw new ArgumentNullException(nameof(todoTaskservice));
     }
 
-    [HttpGet("{listId}/tasks")]
+    [HttpGet("{listId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -267,7 +267,7 @@ public class TodoTaskController : ControllerBase
         }
     }
 
-    [HttpDelete("taskId")]
+    [HttpDelete("{taskId}")]
     [ProducesResponseType(typeof(TodoTaskDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -313,4 +313,5 @@ public class TodoTaskController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
     }
+
 }

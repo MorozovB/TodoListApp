@@ -102,7 +102,7 @@ public class TodoTaskDatabaseService : ITodoTaskService
 
         var taskEntity = new TaskItem
         {
-            Id = listId,
+            TodoListId = listId,
             Title = dto.Title,
             Description = dto.Description,
             Priority = dto.Priority,

@@ -345,4 +345,70 @@ public class TodoListController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+
+    /// <summary>
+    /// Gets all tasks for a specific todo list.
+    /// </summary>
+    /// <param name="id">Todo list ID</param>
+    /// <returns>List of tasks</returns>
+    [HttpGet("{id}/tasks")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetTasksByListId(int id)
+    {
+        try
+        {
+            // Validate ID parameter
+            if (id <= 0)
+            {
+                _logger.LogWarning("Invalid list id: {Id}", id);
+                return BadRequest(new { message = "Invalid todo list ID" });
+            }
+
+            // Extract user ID from claims or headers
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = Request.Headers["X-User-Id"].FirstOrDefault();
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("User ID not found in claims or headers");
+                return Unauthorized(new { message = "User ID not found" });
+            }
+
+            _logger.LogInformation("Fetching tasks for todo list {TodoListId} for user {UserId}", id, userId);
+
+            // Call the service to get tasks
+            var tasks = await _todoListService.GetTasksByIdAsync(id, userId);
+
+            _logger.LogInformation(
+                "Successfully retrieved {Count} tasks for todo list {TodoListId}",
+                tasks?.Count() ?? 0, id);
+
+            return Ok(tasks);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning(ex, "Unauthorized access to todo list {TodoListId}", id);
+            return Forbid();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Todo list {TodoListId} not found", id);
+            return NotFound(new { message = $"Todo list with id {id} not found" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Validation error for todo list {TodoListId}", id);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

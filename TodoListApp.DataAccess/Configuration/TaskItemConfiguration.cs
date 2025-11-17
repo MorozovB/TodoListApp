@@ -24,7 +24,7 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             .IsRequired()
             .HasDefaultValue(Entities.Enums.TaskPriority.Medium);
 
-        builder.Property(testc => testc.Status)
+        builder.Property(t => t.Status)
             .IsRequired()
             .HasConversion<int>()
             .HasDefaultValue(false);

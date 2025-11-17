@@ -19,6 +19,8 @@ namespace TodoListApp.DataAccess.Context
         {
             modelBuilder.ApplyConfiguration(new TodoListConfiguration());
             modelBuilder.ApplyConfiguration(new TaskItemConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentConfiguration());
+            modelBuilder.ApplyConfiguration(new TagConfiguration());
         }
     }
 }
