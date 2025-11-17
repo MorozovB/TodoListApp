@@ -1,4 +1,4 @@
-@if (User.Identity.IsAuthenticated)
+@if (User?.Identity?.IsAuthenticated == true)
 {
     <h1>"Hello, @User.Identity.Name!" </h1>
     <form asp-controller="Account" asp-action="Logout" method="post">

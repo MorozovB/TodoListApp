@@ -15,14 +15,14 @@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <h2 class="m-0">@Model.Title</h2>
-    <div class="btn-group" role="group" aria-label="Actions">
-        <a asp-controller="TodoLists" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">Edit</a>
-        <form asp-controller="TodoLists" asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Delete this list?');" style="display:inline;">
+    <fieldset class="btn-group" role="group" aria-label="Actions">
+        <a asp-controller="TodoList" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">Edit</a>
+        <form asp-controller="TodoList" asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Delete this list?');" style="display:inline;">
             <button type="submit" class="btn btn-outline-danger">Delete</button>
             @Html.AntiForgeryToken()
         </form>
-        <a asp-controller="TodoLists" asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-    </div>
+        <a asp-controller="TodoList" asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </fieldset>
 </div>
 
 <div class="card mb-4">
@@ -49,19 +49,28 @@
             @{
                 var progress = Model.TotalTasksCount == 0 ? 0 : (int)Math.Round(100.0 * Model.CompletedTasksCount / Model.TotalTasksCount);
             }
-            <div class="progress-bar" role="progressbar" style="width: @progress%" aria-valuenow="@progress" aria-valuemin="0" aria-valuemax="100">@progress%</div>
+            <progress class="progress w-100"
+                      value="@progress"
+                      max="100">
+                @progress%
+            </progress>
         </div>
     </div>
 </div>
 
 <!-- 6.7 Фильтрация и сортировка -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <ul class="nav nav-tabs" id="taskFilter" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-filter="all" href="#">All tasks</a></li>
-        <li class="nav-item"><a class="nav-link" data-filter="active" href="#">Active (pending)</a></li>
-        <li class="nav-item"><a class="nav-link" data-filter="completed" href="#">Completed</a></li>
+    <ul class="nav nav-tabs" id="taskFilter">
+        <li class="nav-item">
+            <button class="nav-link active" data-filter="all" type="button">All tasks</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-filter="active" type="button">Active (pending)</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-filter="completed" type="button">Completed</button>
+        </li>
     </ul>
-
     <div>
         <select id="sortSelect" class="form-select form-select-sm">
             <option value="created">By date created</option>
@@ -94,11 +103,9 @@ else
                 _ => "badge bg-secondary"
             };
 
-            @* US10: Add overdue class to highlight *@
             var cardClass = overdue ? "list-group-item list-group-item-action mb-2 task-card border-danger" : "list-group-item list-group-item-action mb-2 task-card";
 
             <div class="@cardClass" data-task-id="@task.Id" data-completed="@task.IsCompleted.ToString().ToLower()">
-                @* US10: Show overdue badge *@
                 @if (overdue)
                 {
                     <div class="position-absolute top-0 end-0 m-2">
@@ -143,10 +150,14 @@ else
 
                 @if (!string.IsNullOrWhiteSpace(task.Description))
                 {
-                    <a class="small mt-2 d-inline-block" data-bs-toggle="collapse" href="#desc-@task.Id"
-                       role="button" aria-expanded="false" aria-controls="desc-@task.Id">
+                    <button class="small mt-2 d-inline-block btn btn-link p-0"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#desc-@task.Id"
+                            aria-expanded="false"
+                            aria-controls="desc-@task.Id">
                         Show description
-                    </a>
+                    </button>
                     <div class="collapse mt-2" id="desc-@task.Id">
                         <div class="card card-body p-2">@task.Description</div>
                     </div>
@@ -159,28 +170,44 @@ else
 <div class="card mt-4">
     <div class="card-body">
         <h4>Add New Task</h4>
-        <form id="addTaskForm" asp-controller="Tasks" asp-action="Create" method="post" class="row g-2 align-items-end">
+        <form id="addTaskForm" asp-controller="TodoTask" asp-action="Create" asp-route-todoListId="@Model.Id" method="post" class="row g-2 align-items-end">
             @Html.AntiForgeryToken()
-            <input type="hidden" name="TodoListId" value="@Model.Id" />
 
             <div class="col-md-4">
-                <label class="form-label">Title</label>
-                <input name="Title" class="form-control form-control-sm" required />
+                <label for="TitleInput" class="form-label">Title</label>
+                <input id="TitleInput"
+                       name="Title"
+                       class="form-control form-control-sm"
+                       required />
             </div>
+
             <div class="col-md-4">
-                <label class="form-label">Due Date</label>
-                <input type="date" name="DueDate" class="form-control form-control-sm" />
+                <label for="DueDateInput" class="form-label">Due Date</label>
+                <input id="DueDateInput"
+                       type="date"
+                       name="DueDate"
+                       class="form-control form-control-sm" />
             </div>
+
             <div class="col-md-2">
-                <label class="form-label">Priority</label>
-                <select name="Priority" class="form-select form-select-sm">
-                    <option value="Low">Low</option>
-                    <option value="Medium" selected>Medium</option>
-                    <option value="High">High</option>
+                <label for="PrioritySelect" class="form-label">Priority</label>
+                <select id="PrioritySelect" name="Priority" class="form-select form-select-sm">
+                    <option value="0">Low</option>
+                    <option value="1" selected>Medium</option>
+                    <option value="2">High</option>
                 </select>
             </div>
+
             <div class="col-md-12">
-                <a class="small" data-bs-toggle="collapse" href="#descNew" role="button" aria-expanded="false" aria-controls="descNew">Description (optional)</a>
+                <button class="btn btn-link p-0 small"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#descNew"
+                        aria-expanded="false"
+                        aria-controls="descNew">
+                    Description (optional)
+                </button>
+
                 <div class="collapse mt-2" id="descNew">
                     <textarea name="Description" class="form-control" rows="3"></textarea>
                 </div>
@@ -235,27 +262,25 @@ else
             });
         });
 
-        $('#addTaskForm').on('submit', function (e) {
-            e.preventDefault();
-            var form = $(this);
-            var data = form.serialize();
-            $.ajax({
-                url: form.attr('action') || '/Tasks/Create',
-                method: 'POST',
-                data: data,
-                headers: { 'RequestVerificationToken': token },
-                success: function (newTaskHtml) {
-                    if (newTaskHtml && newTaskHtml.trim()) {
-                        $('#tasksList').prepend(newTaskHtml);
-                    } else {
-                        location.reload();
-                    }
-                    form[0].reset();
-                    $('#descNew').collapse('hide');
-                },
-                error: function () { alert('Failed to add task.'); }
-            });
-        });
+        //         $('#addTaskForm').on('submit', function (e) {
+        //     e.preventDefault();
+        //     var form = $(this);
+
+        //     $.ajax({
+        //         url: form.attr('action'),
+        //         method: 'POST',
+        //         data: form.serialize(),
+        //         success: function () {
+        //             form[0].reset();
+        //             $('#descNew').collapse('hide');
+        //             location.reload();
+        //         },
+        //         error: function (xhr) {
+        //             console.error('Error:', xhr.responseText);
+        //             alert('Failed to add task. Check console.');
+        //         }
+        //     });
+        // });
 
         $('#taskFilter a').on('click', function (e) {
             e.preventDefault();

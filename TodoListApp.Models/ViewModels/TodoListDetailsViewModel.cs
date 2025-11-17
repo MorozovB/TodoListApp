@@ -12,7 +12,7 @@ public class TodoListDetailsViewModel
     public string FormattedCreatedDate
         => CreatedDate.ToString("MMMM dd, yyyy");
 
-    public List<TodoTaskViewModel> Tasks { get; set; }
+    public List<TodoTaskViewModel> Tasks { get; set; } = new List<TodoTaskViewModel>();
 
     public int CompletedTasksCount { get; set; }
 

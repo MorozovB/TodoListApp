@@ -73,7 +73,7 @@ public class TodoTaskDatabaseService : ITodoTaskService
 
         return new TodoTaskDto
         {
-            Id = taskEntity.Id,
+            Id = taskEntity!.Id,
             Title = taskEntity.Title!,
             Description = taskEntity.Description,
             Priority = taskEntity.Priority,
@@ -107,8 +107,8 @@ public class TodoTaskDatabaseService : ITodoTaskService
             Description = dto.Description,
             Priority = dto.Priority,
             Status = dto.Status,
+            CreatedDate = DateTime.UtcNow,
         };
-        taskEntity.CreatedDate = DateTime.UtcNow;
 
         var createdTask = await this._taskRepository.AddAsync(taskEntity);
 
@@ -137,7 +137,7 @@ public class TodoTaskDatabaseService : ITodoTaskService
 
         var taskEntity = await _taskRepository.GetByIdAsync(dto.Id);
 
-        taskEntity.Title = dto.Title;
+        taskEntity!.Title = dto.Title;
         taskEntity.Description = dto.Description;
         taskEntity.Priority = dto.Priority;
         taskEntity.Status = dto.Status;
@@ -186,7 +186,7 @@ public class TodoTaskDatabaseService : ITodoTaskService
 
         var taskEntity = await _taskRepository.GetByIdAsync(taskId);
 
-        taskEntity.IsCompleted = !taskEntity.IsCompleted;
+        taskEntity!.IsCompleted = !taskEntity.IsCompleted;
 
         if (taskEntity.IsCompleted)
         {

@@ -36,7 +36,7 @@ public class TodoListDatabaseService : ITodoListService
             .Select(t => new TodoListDto
             {
                 Id = t.Id,
-                Title = t.Title,
+                Title = t.Title!,
                 Description = t.Description,
                 CreatedDate = t.CreatedDate,
                 TaskCount = t.Tasks?.Count ?? 0,
@@ -118,14 +118,15 @@ public class TodoListDatabaseService : ITodoListService
         ArgumentNullException.ThrowIfNull(todoListDto);
         ArgumentNullException.ThrowIfNull(userId);
 
-        var entity = new TodoListEntity
+        TodoListEntity entity = new()
         {
             Title = todoListDto.Title,
             Description = todoListDto.Description,
+            OwnerId = userId,
+            CreatedDate = DateTime.UtcNow
         };
 
-        entity.OwnerId = userId;
-        entity.CreatedDate = DateTime.UtcNow;
+
 
         var createdEntity = await this._todoListRepository.CreateAsync(entity);
 

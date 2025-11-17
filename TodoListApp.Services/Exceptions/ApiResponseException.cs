@@ -2,7 +2,7 @@ namespace TodoListApp.Services.Exceptions
 {
     public class ApiResponseException : ApiException
     {
-        public int? StatusCode { get; }
+        public new int? StatusCode { get; }
 
         public ApiResponseException() : base()
         {

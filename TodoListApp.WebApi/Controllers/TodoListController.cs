@@ -11,10 +11,12 @@ namespace TodoListApp.WebApi.Controllers;
 public class TodoListController : ControllerBase
 {
     private readonly ITodoListService _todoListService;
+    private readonly ITodoTaskService _todoTaskService;
     private readonly ILogger<TodoListController> _logger;
-    public TodoListController(ITodoListService todoListService, ILogger<TodoListController> logger)
+    public TodoListController(ITodoListService todoListService, ITodoTaskService todoTaskService, ILogger<TodoListController> logger)
     {
         this._todoListService = todoListService ?? throw new ArgumentNullException(nameof(todoListService));
+        this._todoTaskService = todoTaskService ?? throw new ArgumentNullException(nameof(todoTaskService));
         this._logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -30,7 +32,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetUSerTodoLists(int pageNumber = 1, int pageSize = 20)
+    public async Task<IActionResult> GetUSerTodoLists(int pageNumber = 1, int pageSize = 20, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -48,12 +50,7 @@ public class TodoListController : ControllerBase
             }
 
             // Extract user ID from claims or headers
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier); // ?? "test-user-id";
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -97,7 +94,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetTodoListById(int id)
+    public async Task<IActionResult> GetTodoListById(int id, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -109,12 +106,8 @@ public class TodoListController : ControllerBase
             }
 
             // Extract user ID from claims or headers
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
             if (string.IsNullOrEmpty(userId))
             {
                 this._logger.LogWarning("User ID not found in claims or headers");
@@ -157,7 +150,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateTodoList(TodoListDto todoListDto)
+    public async Task<IActionResult> CreateTodoList(TodoListDto todoListDto, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -167,12 +160,7 @@ public class TodoListController : ControllerBase
                 return this.BadRequest(this.ModelState);
             }
 
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier); // ?? "test-user-id";
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -220,7 +208,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateTodoList(int id, TodoListDto todoListDto)
+    public async Task<IActionResult> UpdateTodoList(int id, TodoListDto todoListDto, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -241,12 +229,7 @@ public class TodoListController : ControllerBase
             }
 
             // Get user ID from claims or headers
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -298,7 +281,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteTodoList(int id)
+    public async Task<IActionResult> DeleteTodoList(int id, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -308,18 +291,18 @@ public class TodoListController : ControllerBase
                 _logger.LogWarning("Invalid id: {Id}", id);
                 return BadRequest(new { message = "Invalid todo list ID" });
             }
+
             // Get user ID from claims or headers
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
+
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("User ID not found in claims or headers");
                 return Unauthorized(new { message = "User ID not found" });
             }
+
             _logger.LogInformation("Deleting todo list {TodoListId} for user {UserId}", id, userId);
+
             // Call the service to delete the todo list
             await _todoListService.DeleteAsync(id, userId);
             _logger.LogInformation(
@@ -359,7 +342,7 @@ public class TodoListController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetTasksByListId(int id)
+    public async Task<IActionResult> GetTasksByListId(int id, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -371,12 +354,7 @@ public class TodoListController : ControllerBase
             }
 
             // Extract user ID from claims or headers
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -404,6 +382,69 @@ public class TodoListController : ControllerBase
         {
             _logger.LogWarning(ex, "Todo list {TodoListId} not found", id);
             return NotFound(new { message = $"Todo list with id {id} not found" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Validation error for todo list {TodoListId}", id);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Creates a new task in a specific todo list.
+    /// </summary>
+    [HttpPost("{id}/tasks")]
+    [ProducesResponseType(typeof(TodoTaskDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateTask(int id, [FromBody] TodoTaskDto taskDto, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state for create task request");
+                return BadRequest(ModelState);
+            }
+
+            if (id <= 0)
+            {
+                _logger.LogWarning("Invalid list id: {Id}", id);
+                return BadRequest(new { message = "List ID must be greater than zero" });
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("User ID not found in claims or headers");
+                return Unauthorized(new { message = "User ID not found" });
+            }
+
+            _logger.LogInformation("Creating task for todo list {TodoListId} for user {UserId}", id, userId);
+
+            var createdTask = await _todoTaskService.CreateAsync(taskDto, id, userId);
+
+            _logger.LogInformation(
+                "Successfully created task {TaskId} for todo list {TodoListId}",
+                createdTask.Id, id);
+
+            return CreatedAtAction(
+                nameof(GetTasksByListId),
+                new { id = id },
+                createdTask);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Todo list {TodoListId} not found", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning(ex, "Unauthorized access to todo list {TodoListId}", id);
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
         catch (ArgumentException ex)
         {
