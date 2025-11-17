@@ -2,14 +2,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TodoListApp.Models.ViewModels;
 
-public class TodoTaskCreateViewModel
+public class TodoTaskEditViewModel
 {
+    public int Id { get; set; }
+
     [Required(ErrorMessage = "Task title is required")]
-    [MaxLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
+    [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
     [Display(Name = "Title")]
     public string Title { get; set; } = null!;
 
-    [MaxLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
+    [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
     [Display(Name = "Description")]
     [DataType(DataType.MultilineText)]
     public string? Description { get; set; }
@@ -18,10 +20,11 @@ public class TodoTaskCreateViewModel
     [DataType(DataType.Date)]
     public DateTime? DueDate { get; set; }
 
+    [Required]
     [Display(Name = "Priority")]
-    public int Priority { get; set; } = 1;
+    public int Priority { get; set; }
 
     public int TodoListId { get; set; }
 
-    public string? TodoListTitle { get; set; }
+    public string TodoListTitle { get; set; } = null!;
 }

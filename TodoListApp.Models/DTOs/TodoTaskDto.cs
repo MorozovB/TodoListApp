@@ -19,7 +19,7 @@ public class TodoTaskDto
 
     public DateTime? CompletedDate { get; set; }
 
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
     public int TodoListId { get; set; }
 }
