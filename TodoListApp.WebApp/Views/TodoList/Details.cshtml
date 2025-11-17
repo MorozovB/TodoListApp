@@ -1,0 +1,258 @@
+@using TodoListApp.Entities.Enums
+@model TodoListDetailsViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@* Breadcrumb *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="TodoLists" asp-action="Index">My Lists</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="m-0">@Model.Title</h2>
+    <div class="btn-group" role="group" aria-label="Actions">
+        <a asp-controller="TodoLists" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">Edit</a>
+        <form asp-controller="TodoLists" asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Delete this list?');" style="display:inline;">
+            <button type="submit" class="btn btn-outline-danger">Delete</button>
+            @Html.AntiForgeryToken()
+        </form>
+        <a asp-controller="TodoLists" asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="card-text">@Model.Description</p>
+        }
+        <dl class="row mb-2">
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9">@Model.CreatedDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+            <dt class="col-sm-3">Total tasks</dt>
+            <dd class="col-sm-9">@Model.TotalTasksCount</dd>
+
+            <dt class="col-sm-3">Completed</dt>
+            <dd class="col-sm-9">@Model.CompletedTasksCount</dd>
+
+            <dt class="col-sm-3">Pending</dt>
+            <dd class="col-sm-9">@(Model.TotalTasksCount - Model.TotalTasksCount)</dd>
+        </dl>
+
+        <div class="progress" style="height: 18px;">
+            @{
+                var progress = Model.TotalTasksCount == 0 ? 0 : (int)Math.Round(100.0 * Model.CompletedTasksCount / Model.TotalTasksCount);
+            }
+            <div class="progress-bar" role="progressbar" style="width: @progress%" aria-valuenow="@progress" aria-valuemin="0" aria-valuemax="100">@progress%</div>
+        </div>
+    </div>
+</div>
+
+<!-- 6.7 Фильтрация и сортировка -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <ul class="nav nav-tabs" id="taskFilter" role="tablist">
+        <li class="nav-item"><a class="nav-link active" data-filter="all" href="#">All tasks</a></li>
+        <li class="nav-item"><a class="nav-link" data-filter="active" href="#">Active (pending)</a></li>
+        <li class="nav-item"><a class="nav-link" data-filter="completed" href="#">Completed</a></li>
+    </ul>
+
+    <div>
+        <select id="sortSelect" class="form-select form-select-sm">
+            <option value="created">By date created</option>
+            <option value="due">By due date</option>
+            <option value="priority">By priority</option>
+            <option value="name">By name</option>
+        </select>
+    </div>
+</div>
+
+<h3>Tasks</h3>
+@if (Model.Tasks == null || !Model.Tasks.Any())
+{
+    <div class="text-center p-4 border rounded empty-state">
+        <div style="font-size:48px;">📭</div>
+        <p class="mb-1">No tasks yet. Add your first task below!</p>
+    </div>
+}
+else
+{
+    <div id="tasksList" class="list-group">
+        @foreach (var task in Model.Tasks.OrderBy(t => t.DueDate ?? DateTime.MaxValue))
+        {
+            var overdue = task.DueDate.HasValue && task.DueDate.Value.Date < DateTime.UtcNow.Date && !task.IsCompleted;
+            var priorityClass = task.Priority switch
+            {
+                (int)TaskPriority.High => "badge bg-danger",
+                (int)TaskPriority.Medium => "badge bg-warning text-dark",
+                (int)TaskPriority.Low => "badge bg-secondary",
+                _ => "badge bg-secondary"
+            };
+
+            <div class="list-group-item list-group-item-action mb-2 task-card" data-task-id="@task.Id" data-completed="@task.IsCompleted.ToString().ToLower()">
+                <div class="d-flex w-100 justify-content-between align-items-start">
+                    <div class="form-check">
+                        <input class="form-check-input task-toggle" type="checkbox" value="" id="chk-@task.Id" @(task.IsCompleted ? "checked" : "") />
+                        <label class="form-check-label" for="chk-@task.Id">
+                            <span class="task-title @(task.IsCompleted ? "text-decoration-line-through" : "")">@task.Title</span>
+                        </label>
+                    </div>
+                    <div class="text-end">
+                        <span class="me-2 @priorityClass">@task.Priority</span>
+                        <small class="me-2 @(overdue ? "text-danger" : "text-muted")">@((task.DueDate.HasValue) ? task.DueDate.Value.ToString("yyyy-MM-dd") : "—")</small>
+                        <div class="btn-group">
+                            <a asp-controller="Tasks" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-task" data-task-id="@task.Id" title="Delete"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(task.Description))
+                {
+                    <a class="small mt-2 d-inline-block" data-bs-toggle="collapse" href="#desc-@task.Id" role="button" aria-expanded="false" aria-controls="desc-@task.Id">Show description</a>
+                    <div class="collapse mt-2" id="desc-@task.Id">
+                        <div class="card card-body p-2">@task.Description</div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h4>Add New Task</h4>
+        <form id="addTaskForm" asp-controller="Tasks" asp-action="Create" method="post" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="TodoListId" value="@Model.Id" />
+
+            <div class="col-md-4">
+                <label class="form-label">Title</label>
+                <input name="Title" class="form-control form-control-sm" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Due Date</label>
+                <input type="date" name="DueDate" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Priority</label>
+                <select name="Priority" class="form-select form-select-sm">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <a class="small" data-bs-toggle="collapse" href="#descNew" role="button" aria-expanded="false" aria-controls="descNew">Description (optional)</a>
+                <div class="collapse mt-2" id="descNew">
+                    <textarea name="Description" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var token = $('input[name="__RequestVerificationToken"]').first().val();
+
+        $(document).on('change', '.task-toggle', function () {
+            var chk = $(this);
+            var taskId = chk.closest('.task-card').data('task-id');
+            var completed = chk.is(':checked');
+
+            $.ajax({
+                url: '/Tasks/ToggleComplete',
+                method: 'POST',
+                data: { id: taskId },
+                headers: { 'RequestVerificationToken': token },
+                success: function (resp) {
+                    var title = chk.closest('.task-card').find('.task-title');
+                    if (completed) {
+                        title.addClass('text-decoration-line-through');
+                        chk.closest('.task-card').attr('data-completed', 'true');
+                    } else {
+                        title.removeClass('text-decoration-line-through');
+                        chk.closest('.task-card').attr('data-completed', 'false');
+                    }
+                },
+                error: function () { alert('Failed to update task.'); chk.prop('checked', !completed); }
+            });
+        });
+
+        $(document).on('click', '.btn-delete-task', function () {
+            if (!confirm('Delete this task?')) return;
+            var btn = $(this);
+            var taskId = btn.data('task-id');
+            $.ajax({
+                url: '/Tasks/Delete',
+                method: 'POST',
+                data: { id: taskId },
+                headers: { 'RequestVerificationToken': token },
+                success: function () { btn.closest('.task-card').fadeOut(200, function () { $(this).remove(); }); },
+                error: function () { alert('Failed to delete task.'); }
+            });
+        });
+
+        $('#addTaskForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var data = form.serialize();
+            $.ajax({
+                url: form.attr('action') || '/Tasks/Create',
+                method: 'POST',
+                data: data,
+                headers: { 'RequestVerificationToken': token },
+                success: function (newTaskHtml) {
+                    if (newTaskHtml && newTaskHtml.trim()) {
+                        $('#tasksList').prepend(newTaskHtml);
+                    } else {
+                        location.reload();
+                    }
+                    form[0].reset();
+                    $('#descNew').collapse('hide');
+                },
+                error: function () { alert('Failed to add task.'); }
+            });
+        });
+
+        $('#taskFilter a').on('click', function (e) {
+            e.preventDefault();
+            $('#taskFilter .nav-link').removeClass('active');
+            $(this).addClass('active');
+            var filter = $(this).data('filter');
+            $('#tasksList .task-card').each(function () {
+                var completed = $(this).data('completed') === true || $(this).data('completed') === 'true';
+                if (filter === 'all') $(this).show();
+                if (filter === 'active') $(this).toggle(!completed);
+                if (filter === 'completed') $(this).toggle(completed);
+            });
+        });
+
+        $('#sortSelect').on('change', function () {
+            var val = $(this).val();
+            var items = $('#tasksList .task-card').get();
+            items.sort(function (a, b) {
+                var at = $(a), bt = $(b);
+                if (val === 'name') return at.find('.task-title').text().localeCompare(bt.find('.task-title').text());
+                if (val === 'due') {
+                    var ad = at.find('small').first().text().trim();
+                    var bd = bt.find('small').first().text().trim();
+                    return (ad === '—' ? '9999-12-31' : ad).localeCompare(bd === '—' ? '9999-12-31' : bd);
+                }
+                if (val === 'priority') return bt.find('.badge').text().length - at.find('.badge').text().length; // простая эвристика
+                return 0;
+            });
+            $.each(items, function (i, itm) { $('#tasksList').append(itm); });
+        });
+    </script>
+}
