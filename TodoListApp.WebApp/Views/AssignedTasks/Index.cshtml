@@ -1,0 +1,165 @@
+﻿@model AssignedTasksViewModel
+@using TodoListApp.Entities.Enums
+
+@{
+    ViewData["Title"] = "My Assigned Tasks";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="form-inline">
+            <div class="form-group mr-2">
+                <label for="statusFilter" class="mr-2">Filter by Status:</label>
+                <select name="status" id="statusFilter" class="form-control" onchange="this.form.submit()">
+                    <option value="">Active Tasks</option>
+                    <option value="@((int)StatusOfTask.NotStarted)" selected="@(Model.CurrentFilter == StatusOfTask.NotStarted)">Not Started</option>
+                    <option value="@((int)StatusOfTask.InProgress)" selected="@(Model.CurrentFilter == StatusOfTask.InProgress)">In Progress</option>
+                    <option value="@((int)StatusOfTask.Completed)" selected="@(Model.CurrentFilter == StatusOfTask.Completed)">Completed</option>
+                </select>
+            </div>
+            <input type="hidden" name="sortBy" value="@Model.CurrentSort" />
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="form-inline float-right">
+            <div class="form-group mr-2">
+                <label for="sortByFilter" class="mr-2">Sort by:</label>
+                <select name="sortBy" id="sortByFilter" class="form-control" onchange="this.form.submit()">
+                    <option value="duedate" selected="@(Model.CurrentSort == "duedate")">Due Date</option>
+                    <option value="name" selected="@(Model.CurrentSort == "name")">Name</option>
+                    <option value="priority" selected="@(Model.CurrentSort == "priority")">Priority</option>
+                    <option value="status" selected="@(Model.CurrentSort == "status")">Status</option>
+                </select>
+            </div>
+            <input type="hidden" name="status" value="@((int?)Model.CurrentFilter)" />
+        </form>
+    </div>
+</div>
+
+@if (Model.Tasks.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr class="@(task.IsOverdue ? "table-danger" : "")">
+                        <td>
+                            <a asp-controller="TodoTask" asp-action="Details" asp-route-id="@task.Id">
+                                @task.Title
+                            </a>
+                            @if (task.IsOverdue)
+                            {
+                                <span class="badge bg-danger ml-2">Overdue</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="@task.StatusBadgeClass">@task.StatusText</span>
+                        </td>
+                        <td>
+                            <span class="@task.PriorityBadgeClass">@task.PriorityText</span>
+                        </td>
+                        <td class="@(task.IsOverdue ? "text-danger fw-bold" : "")">
+                            @task.FormattedDueDate
+                        </td>
+                        <td>
+                            <fieldset class="btn-group btn-group-sm">
+                                <legend class="visually-hidden">Task Status Actions</legend>
+                                @if (task.Status != StatusOfTask.NotStarted)
+                                {
+                                    <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <input type="hidden" name="newStatus" value="@((int)StatusOfTask.NotStarted)" />
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" title="Not Started">
+                                            <i class="bi bi-circle"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                @if (task.Status != StatusOfTask.InProgress)
+                                {
+                                    <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <input type="hidden" name="newStatus" value="@((int)StatusOfTask.InProgress)" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm" title="In Progress">
+                                            <i class="bi bi-play-circle"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                @if (task.Status != StatusOfTask.Completed)
+                                {
+                                    <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <input type="hidden" name="newStatus" value="@((int)StatusOfTask.Completed)" />
+                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Complete">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </fieldset>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageNumber - 1)"
+                           asp-route-status="@Model.CurrentFilter"
+                           asp-route-sortBy="@Model.CurrentSort">Previous</a>
+                    </li>
+                }
+
+                @for (var i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-pageNumber="@i"
+                           asp-route-status="@Model.CurrentFilter"
+                           asp-route-sortBy="@Model.CurrentSort">@i</a>
+                    </li>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageNumber + 1)"
+                           asp-route-status="@Model.CurrentFilter"
+                           asp-route-sortBy="@Model.CurrentSort">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No tasks assigned to you.
+    </div>
+}

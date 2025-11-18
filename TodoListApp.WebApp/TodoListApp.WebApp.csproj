@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Tags\TaskByTag.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Views\Tags\TaskByTag.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.36" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.36" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.36" />
@@ -21,6 +29,10 @@
   <ItemGroup>
     <ProjectReference Include="..\TodoListApp.Models\TodoListApp.Models.csproj" />
     <ProjectReference Include="..\TodoListApp.Services\TodoListApp.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\TodoTask\AssignedTasks\" />
   </ItemGroup>
 
 </Project>

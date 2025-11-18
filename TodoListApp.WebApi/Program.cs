@@ -82,6 +82,10 @@ public class Program
         builder.Services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
         builder.Services.AddScoped<ITodoListService, TodoListDatabaseService>();
         builder.Services.AddScoped<ITodoTaskService, TodoTaskDatabaseService>();
+        builder.Services.AddScoped<IAssignedTasksService, AssignedTasksDatabaseService>();
+        builder.Services.AddScoped<ISearchService, SearchDatabaseService>();
+        builder.Services.AddScoped<ITagService, TagDatabaseService>();
+        builder.Services.AddScoped<ICommentService, CommentDatabaseService>();
 
         // Add DB context
         builder.Services.AddDbContext<UserDbContext>(options =>
@@ -116,7 +120,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        app.UseCors();
+        app.UseCors("AllowWebApp");
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseMiddleware<BearerTokenAuthenticationMiddleware>();

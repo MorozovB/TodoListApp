@@ -8,6 +8,8 @@ public class Comment
 
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
+    public string? CreatedBy { get; set; }
+
     public TaskItem? Task { get; set; }
 
     public string Content { get; set; } = string.Empty;

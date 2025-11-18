@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TodoListApp.Entities;
+using TodoListApp.Entities.Enums;
 
 namespace TodoListApp.DataAccess.Configuration;
 public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
@@ -22,12 +23,12 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 
         builder.Property(t => t.Priority)
             .IsRequired()
-            .HasDefaultValue(Entities.Enums.TaskPriority.Medium);
+            .HasDefaultValue(TaskPriority.Medium);
 
         builder.Property(t => t.Status)
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(false);
+            .HasDefaultValue(StatusOfTask.NotStarted);
 
         builder.Property(t => t.IsCompleted)
             .IsRequired()

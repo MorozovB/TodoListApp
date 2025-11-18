@@ -61,6 +61,7 @@ public class Program
 
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
+
         builder.Services.AddHttpClient<ITodoTaskService, TodoTaskWebApiService>((serviceProvider, client) =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
@@ -70,6 +71,42 @@ public class Program
             var bearerToken = configuration["WebApi:BearerToken"];
             client.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        });
+
+        builder.Services.AddHttpClient<IAssignedTasksService, AssignedTasksWebApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["WebApi:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl!);
+            var bearerToken = configuration["WebApi:BearerToken"];
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        });
+
+        builder.Services.AddHttpClient<ISearchService, SearchWebApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["WebApi:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl!);
+            var bearerToken = configuration["WebApi:BearerToken"];
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        });
+
+        builder.Services.AddHttpClient<ITagService, TagWebApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["WebApi:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl!);
+            var bearerToken = configuration["WebApi:BearerToken"];
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        });
+
+        builder.Services.AddHttpClient<ICommentService, CommentWebApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["WebApi:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl!);
+            var bearerToken = configuration["WebApi:BearerToken"];
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
         });
 
         var app = builder.Build();

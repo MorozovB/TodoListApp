@@ -13,12 +13,10 @@ namespace TodoListApp.WebApp.Controllers;
 public class TodoListController : Controller
 {
     private readonly ITodoListService _todoListService;
-    private readonly ITodoTaskService _todoTaskService;
 
-    public TodoListController(ITodoListService todoListService, ITodoTaskService todoTaskService)
+    public TodoListController(ITodoListService todoListService)
     {
         _todoListService = todoListService;
-        _todoTaskService = todoTaskService;
     }
     [HttpGet]
     public async Task<IActionResult> Index(int pageNumber = 1)

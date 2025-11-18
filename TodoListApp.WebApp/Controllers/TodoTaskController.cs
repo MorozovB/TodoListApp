@@ -13,16 +13,13 @@ public class TodoTaskController : Controller
 {
     private readonly ITodoTaskService _todoTaskService;
     private readonly ITodoListService _todoListService;
-    private readonly ILogger<TodoTaskController> _logger;
 
     public TodoTaskController(
         ITodoTaskService todoTaskService,
-        ITodoListService todoListService,
-        ILogger<TodoTaskController> logger)
+        ITodoListService todoListService)
     {
         _todoTaskService = todoTaskService;
         _todoListService = todoListService;
-        _logger = logger;
     }
 
     [HttpGet]
@@ -89,6 +86,7 @@ public class TodoTaskController : Controller
     public async Task<IActionResult> Create(int todoListId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (string.IsNullOrEmpty(userId))
         {
             return RedirectToAction("Login", "Account");
@@ -131,6 +129,7 @@ public class TodoTaskController : Controller
         }
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (string.IsNullOrEmpty(userId))
         {
             return RedirectToAction("Login", "Account");

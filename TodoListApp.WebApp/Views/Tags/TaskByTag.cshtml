@@ -1,0 +1,154 @@
+@model TasksByTagViewModel
+
+@{
+    ViewData["Title"] = $"Tasks Tagged: {Model.TagName}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-tag"></i> @ViewData["Title"]</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Tags
+    </a>
+</div>
+
+@if (Model.Tasks.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr class="@(task.IsOverdue ? "table-danger" : "")">
+                        <td>
+                            <a asp-controller="TodoTask" asp-action="Details" asp-route-id="@task.Id">
+                                @task.Title
+                            </a>
+                            @if (task.IsOverdue)
+                            {
+                                <span class="badge bg-danger ml-2">Overdue</span>
+                            }
+                        </td>
+                        <td>
+                            @(task.Description ?? "-")
+                        </td>
+                        <td>
+                            @if (task.IsCompleted)
+                            {
+                                <span class="badge bg-success">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">Active</span>
+                            }
+                        </td>
+                        <td class="@(task.IsOverdue ? "text-danger fw-bold" : "")">
+                            @task.FormattedDueDate
+                        </td>
+                        <td>
+                            <a asp-controller="TodoTask" asp-action="Details" asp-route-id="@task.Id" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a asp-controller="TodoList" asp-action="Details" asp-route-id="@task.TodoListId" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-list"></i> View List
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No tasks have been tagged with "@Model.TagName".
+    </div>
+}
+@model TasksByTagViewModel
+
+@{
+    ViewData["Title"] = $"Tasks Tagged: {Model.TagName}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-tag"></i> @ViewData["Title"]</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Tags
+    </a>
+</div>
+
+@if (Model.Tasks.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr class="@(task.IsOverdue ? "table-danger" : "")">
+                        <td>
+                            <a asp-controller="TodoTask" asp-action="Details" asp-route-id="@task.Id">
+                                @task.Title
+                            </a>
+                            @if (task.IsOverdue)
+                            {
+                                <span class="badge bg-danger ml-2">Overdue</span>
+                            }
+                        </td>
+                        <td>
+                            @(task.Description ?? "-")
+                        </td>
+                        <td>
+                            @if (task.IsCompleted)
+                            {
+                                <span class="badge bg-success">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">Active</span>
+                            }
+                        </td>
+                        <td class="@(task.IsOverdue ? "text-danger fw-bold" : "")">
+                            @task.FormattedDueDate
+                        </td>
+                        <td>
+                            <a asp-controller="TodoTask" asp-action="Details" asp-route-id="@task.Id" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a asp-controller="TodoList" asp-action="Details" asp-route-id="@task.TodoListId" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-list"></i> View List
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No tasks have been tagged with "@Model.TagName".
+    </div>
+}

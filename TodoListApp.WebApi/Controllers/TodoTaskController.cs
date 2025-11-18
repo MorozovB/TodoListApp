@@ -22,20 +22,15 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetByListIdAsync(int listId)
+    public async Task<IActionResult> GetByListIdAsync(int listId, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (listId <= 0)
             {
                 return BadRequest(new { message = "List ID can't be zero or negative" });
-            }
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
             }
 
             if (string.IsNullOrEmpty(userId))
@@ -67,7 +62,7 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetByTaskIdAsync(int taskId)
+    public async Task<IActionResult> GetByTaskIdAsync(int taskId, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -76,12 +71,7 @@ public class TodoTaskController : ControllerBase
                 return BadRequest(new { message = "Task ID must be greater than zero." });
             }
 
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -119,7 +109,7 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateTaskAsync(int listId, [FromBody] TodoTaskDto taskDto)
+    public async Task<IActionResult> CreateTaskAsync(int listId, [FromBody] TodoTaskDto taskDto, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -133,12 +123,7 @@ public class TodoTaskController : ControllerBase
                 return BadRequest(new { message = "List ID must be greater than zero" });
             }
 
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -171,7 +156,7 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateTaskAsync(int taskId, [FromBody] TodoTaskDto taskDto)
+    public async Task<IActionResult> UpdateTaskAsync(int taskId, [FromBody] TodoTaskDto taskDto, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -185,12 +170,7 @@ public class TodoTaskController : ControllerBase
                 return BadRequest(new { message = "Task ID must be greater than zero" });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -227,7 +207,7 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ToggleTaskStatusAsync(int taskId)
+    public async Task<IActionResult> ToggleStatusOfTaskAsync(int taskId, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -236,12 +216,7 @@ public class TodoTaskController : ControllerBase
                 return BadRequest(new { message = "Task ID must be greater than zero" });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -275,7 +250,7 @@ public class TodoTaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteTaskAsync(int taskId)
+    public async Task<IActionResult> DeleteTaskAsync(int taskId, [FromHeader(Name = "X-User-Id")] string? userIdFromHeader = null)
     {
         try
         {
@@ -284,12 +259,7 @@ public class TodoTaskController : ControllerBase
                 return BadRequest(new { message = "Task ID must be greater than zero" });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = Request.Headers["X-User-Id"].FirstOrDefault();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? userIdFromHeader;
 
             if (string.IsNullOrEmpty(userId))
             {

@@ -1,0 +1,37 @@
+@model List<TagViewModel>
+
+@{
+    ViewData["Title"] = "All Tags";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var tag in Model.OrderByDescending(t => t.TaskCount))
+        {
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="bi bi-tag"></i> @tag.Name
+                        </h5>
+                        <p class="card-text">
+                            <span class="badge bg-primary">@tag.TaskCount task(s)</span>
+                        </p>
+                        <a asp-action="TasksByTag" asp-route-id="@tag.Id" class="btn btn-sm btn-outline-primary">
+                            View Tasks
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No tags have been created yet. Tags are automatically created when you add them to tasks.
+    </div>
+}

@@ -1,0 +1,48 @@
+@model SearchViewModel
+
+@{
+    ViewData["Title"] = "Search Tasks";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Results" method="get">
+                    <div class="mb-3">
+                        <label for="q" class="form-label">Search Query</label>
+                        <input type="text" class="form-control" id="q" name="q" placeholder="Enter task title or description..." required>
+                        <small class="form-text text-muted">Search by task title or description</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">Start Date (Optional)</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="endDate" class="form-label">End Date (Optional)</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h5>Search Tips:</h5>
+            <ul>
+                <li>Enter keywords from task titles or descriptions</li>
+                <li>Use date filters to narrow down results by creation or due dates</li>
+                <li>Leave date fields empty to search all dates</li>
+            </ul>
+        </div>
+    </div>
+</div>

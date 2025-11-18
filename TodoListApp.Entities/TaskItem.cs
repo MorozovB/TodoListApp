@@ -19,11 +19,13 @@ public class TaskItem
 
     public TaskPriority Priority { get; set; } = TaskPriority.Medium;
 
-    public bool Status { get; set; }
+    public StatusOfTask Status { get; set; } = StatusOfTask.NotStarted;
 
     public int TodoListId { get; set; }
 
     public TodoListEntity? TodoList { get; set; }
+
+    public string? AssignedToUserId { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

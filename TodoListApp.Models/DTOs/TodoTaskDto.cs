@@ -13,7 +13,7 @@ public class TodoTaskDto
 
     public TaskPriority Priority { get; set; }
 
-    public bool Status { get; set; }
+    public StatusOfTask Status { get; set; }
 
     public DateTime CreatedDate { get; set; }
 
@@ -22,4 +22,6 @@ public class TodoTaskDto
     public DateTime? DueDate { get; set; }
 
     public int TodoListId { get; set; }
+
+    public string? AssignedToUserId { get; set; }
 }

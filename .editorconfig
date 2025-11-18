@@ -290,3 +290,4 @@ dotnet_diagnostic.SA1633.severity = none      # FileMustHaveHeader
 dotnet_diagnostic.S1135.severity = none
 dotnet_diagnostic.IDE0009.severity = none
 dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.S6967.severity = none
