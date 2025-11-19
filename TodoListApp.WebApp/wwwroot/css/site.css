@@ -43,3 +43,27 @@ body {
 .alert-danger i {
     margin-right: 0.5rem;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bi-check-circle {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.card {
+    animation: fadeIn 0.7s ease-in-out;
+}
+
+.btn {
+    animation: fadeIn 1s ease-in-out;
+}

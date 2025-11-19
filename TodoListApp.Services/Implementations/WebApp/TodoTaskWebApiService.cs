@@ -16,12 +16,29 @@ public class TodoTaskWebApiService : ITodoTaskService
     {
         try
         {
-            var url = $"api/todolist/{listId}/tasks";
+            var url = $"api/task/{listId}/tasks";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-User-Id", userId);
 
             var response = await this._httpClient.SendAsync(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new KeyNotFoundException($"List with ID {listId} not found");
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new UnauthorizedAccessException("Access to this list is forbidden");
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new ArgumentException($"Bad request: {errorContent}");
+            }
+
             response.EnsureSuccessStatusCode();
 
             var jsonString = await response.Content.ReadAsStringAsync();
@@ -54,7 +71,18 @@ public class TodoTaskWebApiService : ITodoTaskService
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return null!;
+                throw new KeyNotFoundException($"Task with ID {taskId} not found");
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new UnauthorizedAccessException("Access to this task is forbidden");
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new ArgumentException($"Bad request: {errorContent}");
             }
 
             response.EnsureSuccessStatusCode();

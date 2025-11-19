@@ -1,3 +1,4 @@
+using TodoListApp.DataAccess.Repositories.Implementations;
 using TodoListApp.DataAccess.Repositories.Interfaces;
 using TodoListApp.Entities;
 using TodoListApp.Models.DTOs;
@@ -70,6 +71,11 @@ public class TodoTaskDatabaseService : ITodoTaskService
         }
 
         var taskEntity = await _taskRepository.GetByIdAsync(taskId);
+
+        if (taskEntity == null)
+        {
+            throw new KeyNotFoundException($"Task with ID {taskId} not found");
+        }
 
         return new TodoTaskDto
         {

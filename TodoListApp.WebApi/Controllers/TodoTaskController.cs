@@ -16,7 +16,7 @@ public class TodoTaskController : ControllerBase
         this._todoTaskService = todoTaskservice ?? throw new ArgumentNullException(nameof(todoTaskservice));
     }
 
-    [HttpGet("{listId}")]
+    [HttpGet("{listId}/tasks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

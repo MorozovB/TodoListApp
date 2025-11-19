@@ -67,7 +67,7 @@ public class TodoListRepository : ITodoListRepository
         var todoList = await this.GetByIdAsync(todoListId);
         if (todoList is null)
         {
-            throw new InvalidOperationException($"Todo list with id {todoListId} not found.");
+            return false;
         }
         return this._dbContext.TodoLists.AnyAsync(tl => tl.Id == todoListId && tl.OwnerId == userId).Result;
     }
