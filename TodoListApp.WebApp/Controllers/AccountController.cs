@@ -114,7 +114,7 @@ public class AccountController : Controller
                 "Account",
                 new { userId = user.Id, code = code },
                 protocol: Request.Scheme);
-
+            Console.WriteLine(callbackUrl);
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
 

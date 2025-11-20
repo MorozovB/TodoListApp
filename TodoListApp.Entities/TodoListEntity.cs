@@ -14,6 +14,5 @@ namespace TodoListApp.Entities
 
         public ICollection<TaskItem> Tasks { get; set; } = null!;
 
-        // public ICollection<UserTodoListAccess> SharedWith { get; set; }
     }
 }

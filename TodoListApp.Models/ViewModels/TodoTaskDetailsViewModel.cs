@@ -49,15 +49,41 @@ public class TodoTaskDetailsViewModel
         _ => "badge bg-secondary"
     };
 
-    public string StatusBadgeClass => IsCompleted
-        ? "badge bg-success"
-        : IsOverdue
-            ? "badge bg-danger"
-            : "badge bg-primary";
+    public string StatusBadgeClass
+    {
+        get
+        {
+            if (IsCompleted)
+            {
+                return "badge bg-success";
+            }
+            else if (IsOverdue)
+            {
+                return "badge bg-danger";
+            }
+            else
+            {
+                return "badge bg-primary";
+            }
+        }
+    }
 
-    public string StatusText => IsCompleted
-        ? "Completed"
-        : IsOverdue
-            ? "Overdue"
-            : "Active";
+    public string StatusText
+    {
+        get
+        {
+            if (IsCompleted)
+            {
+                return "Completed";
+            }
+            else if (IsOverdue)
+            {
+                return "Overdue";
+            }
+            else
+            {
+                return "Active";
+            }
+        }
+    }
 }

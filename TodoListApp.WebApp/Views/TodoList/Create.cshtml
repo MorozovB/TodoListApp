@@ -11,13 +11,12 @@
 
             <form asp-action="Create" method="post">
                 <div class="mb-3">
-                    <label asp-for="Title" class="form-label"></label>
+                    <label for="Title" class="form-label">Title</label>
                     <input asp-for="Title" class="form-control" placeholder="Enter a title for your to-do list" />
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
-
                 <div class="mb-3">
-                    <label asp-for="Description" class="form-label"></label>
+                    <label for="Description" class="form-label">Description</label>
                     <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter a short description"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>

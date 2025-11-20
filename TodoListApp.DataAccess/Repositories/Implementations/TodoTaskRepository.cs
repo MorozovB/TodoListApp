@@ -37,20 +37,27 @@ public class TodoTaskRepository : ITodoTaskRepository
             .ToListAsync();
     }
 
-    public async Task<TaskItem> AddAsync(TaskItem item)
+    public Task<TaskItem> AddAsync(TaskItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
+        return AddAsyncCore(item);
+    }
 
+    private async Task<TaskItem> AddAsyncCore(TaskItem item)
+    {
         var taskItem = await this._dbcontext.Tasks.AddAsync(item);
         await this._dbcontext.SaveChangesAsync();
-
         return taskItem.Entity;
     }
 
-    public async Task<TaskItem> UpdateAsync(TaskItem item)
+    public Task<TaskItem> UpdateAsync(TaskItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
+        return UpdateAsyncCore(item);
+    }
 
+    private async Task<TaskItem> UpdateAsyncCore(TaskItem item)
+    {
         var updatedItem = this._dbcontext.Tasks.Update(item);
         await this._dbcontext.SaveChangesAsync();
         return updatedItem.Entity;

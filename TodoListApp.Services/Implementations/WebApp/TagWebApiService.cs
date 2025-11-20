@@ -11,16 +11,13 @@ namespace TodoListApp.Services.Implementations.WebApp;
 public class TagWebApiService : ITagService
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
-    private readonly string _baseUrl;
-    private readonly string _bearerToken;
 
     public TagWebApiService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _configuration = configuration;
-        _baseUrl = _configuration["WebApi:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured");
-        _bearerToken = _configuration["WebApi:BearerToken"] ?? throw new InvalidOperationException("BearerToken is not configured");
+
+        var _baseUrl = configuration["WebApi:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured");
+        var _bearerToken = configuration["WebApi:BearerToken"] ?? throw new InvalidOperationException("BearerToken is not configured");
 
         _httpClient.BaseAddress = new Uri(_baseUrl);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
@@ -182,13 +179,13 @@ public class TagWebApiService : ITagService
         }
     }
 
-    public async Task<TagDto> GetOrCreateTagAsync(string tagName)
+    public Task<TagDto> GetOrCreateTagAsync(string tagName)
     {
-        return new TagDto
+        return Task.FromResult(new TagDto
         {
             Id = 0,
             Name = tagName,
             TaskCount = 0
-        };
+        });
     }
 }

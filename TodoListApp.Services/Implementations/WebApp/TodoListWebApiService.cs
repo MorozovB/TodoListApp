@@ -11,19 +11,16 @@ namespace TodoListApp.Services.Implementations.WebApp;
 public class TodoListWebApiService : ITodoListService
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
-    private readonly string _baseUrl;
-    private readonly string _bearerToken;
 
     public TodoListWebApiService(HttpClient httpClient, IConfiguration configuration)
     {
         this._httpClient = httpClient;
-        this._configuration = configuration;
-        this._baseUrl = this._configuration["WebApi:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured");
-        this._bearerToken = this._configuration["WebApi:BearerToken"] ?? throw new InvalidOperationException("BearerToken is not configured");
 
-        this._httpClient.BaseAddress = new Uri(this._baseUrl);
-        this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._bearerToken);
+        var _baseUrl = configuration["WebApi:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured");
+        var _bearerToken = configuration["WebApi:BearerToken"] ?? throw new InvalidOperationException("BearerToken is not configured");
+
+        this._httpClient.BaseAddress = new Uri(_baseUrl);
+        this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
     }
 
 
@@ -60,42 +57,41 @@ public class TodoListWebApiService : ITodoListService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
-    public async Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsync(int id, string userId)
+    public Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsync(int id, string userId)
+    {
+        if (id <= 0)
+        {
+            throw new ArgumentException("List ID must be greater than zero", nameof(id));
+        }
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
+        }
+        return GetTasksByIdAsyncCore(id, userId);
+    }
+
+    private async Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsyncCore(int id, string userId)
     {
         try
         {
-            if (id <= 0)
-            {
-                throw new ArgumentException("List ID must be greater than zero", nameof(id));
-            }
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
-            }
-
             var url = $"api/todolist/{id}/tasks";
-
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-User-Id", userId);
-
             var response = await _httpClient.SendAsync(request);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 throw new KeyNotFoundException($"Todo list with ID {id} not found");
             }
-
             if (response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
                 response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new UnauthorizedAccessException("You don't have permission to access this todo list");
             }
-
             if (!response.IsSuccessStatusCode)
             {
                 var statusCode = (int)response.StatusCode;
@@ -105,14 +101,11 @@ public class TodoListWebApiService : ITodoListService
             }
 
             var jsonString = await response.Content.ReadAsStringAsync();
-
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-
             var tasks = JsonSerializer.Deserialize<List<TodoTaskDto>>(jsonString, options);
-
             return tasks ?? new List<TodoTaskDto>();
         }
         catch (HttpRequestException ex)
@@ -158,7 +151,7 @@ public class TodoListWebApiService : ITodoListService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -189,11 +182,11 @@ public class TodoListWebApiService : ITodoListService
             };
 
             var createdTodoList = JsonSerializer.Deserialize<TodoListDto>(jsonString, options);
-            return createdTodoList ?? throw new Exception("Failed to deserialize the created TodoList");
+            return createdTodoList ?? throw new InvalidOperationException("Failed to deserialize the created TodoList");
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -221,7 +214,7 @@ public class TodoListWebApiService : ITodoListService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -242,7 +235,7 @@ public class TodoListWebApiService : ITodoListService
         }
         catch (Exception ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 }

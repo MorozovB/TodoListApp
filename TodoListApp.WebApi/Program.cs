@@ -13,6 +13,8 @@ namespace TodoListApp.WebApi;
 
 public class Program
 {
+    protected Program() { }
+
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -51,7 +53,7 @@ public class Program
                             Id = "Bearer"
                         }
                     },
-                    new string[] {}
+                    Array.Empty<string>()
                 }
             });
         });

@@ -23,7 +23,7 @@
     <div class="col-md-8">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h2>@Model.Title</h2>
-            <div class="btn-group" role="group">
+            <div class="btn-group">
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
@@ -99,9 +99,9 @@
             </div>
             <div class="card-body">
                 <div id="tags-container" class="mb-3">
-                    <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="visually-hidden">Loading tags...</span>
-                    </div>
+                    <output class="spinner-border spinner-border-sm" aria-live="polite">
+                        Loading tags...
+                    </output>
                 </div>
                 
                 <div class="input-group">
@@ -122,11 +122,10 @@
             </div>
             <div class="card-body">
                 <div id="comments-container">
-                    <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="visually-hidden">Loading comments...</span>
-                    </div>
+                    <output class="spinner-border spinner-border-sm" aria-live="polite">
+                        Loading comments...
+                    </output>
                 </div>
-
                 <div class="mt-3 pt-3 border-top">
                     <h6>Add Comment</h6>
                     <div class="mb-3">

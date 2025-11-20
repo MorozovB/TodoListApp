@@ -22,7 +22,7 @@ public class TodoListController : ControllerBase
 
 
     /// <summary>
-    /// Gets paginated todo lists for the authenticated user.
+    /// Gets paginated to-do' lists for the authenticated user.
     /// </summary>
     /// <param name="pageNumber">Number of page</param>
     /// <param name="pageSize">Size of page</param>
@@ -85,7 +85,7 @@ public class TodoListController : ControllerBase
 
 
     /// <summary>
-    /// Gets a specific todo list by its ID for the authenticated user.
+    /// Gets a specific to-do list by its ID for the authenticated user.
     /// </summary>
     /// <param name="id">Id of user</param>
     /// <returns></returns>
@@ -116,7 +116,7 @@ public class TodoListController : ControllerBase
 
             this._logger.LogInformation("Fetching todo list {Id} for user {UserId}", id, userId);
 
-            // Call the service to get the todo list
+            // Call the service to get the to-do list
             var todoList = await this._todoListService.GetTodoListByIdAsync(id, userId);
 
             if (todoList == null)
@@ -142,7 +142,7 @@ public class TodoListController : ControllerBase
 
 
     /// <summary>
-    /// Creates a new todo list for the authenticated user.
+    /// Creates a new to-do list for the authenticated user.
     /// </summary>
     /// <returns></returns>
     [HttpPost]
@@ -171,14 +171,14 @@ public class TodoListController : ControllerBase
             this._logger.LogInformation("Creating todo list '{Title}' for user {UserId}",
                     todoListDto.Title, userId);
 
-            // Call the service to create the todo list
+            // Call the service to create the to-do list
             var createdTodoList = await this._todoListService.CreateAsync(todoListDto, userId);
 
             this._logger.LogInformation(
                     "Successfully created todo list {TodoListId} for user {UserId}",
                     createdTodoList.Id, userId);
 
-            // Return the created todo list with 201 status
+            // Return the created to-do list with 201 status
             return this.CreatedAtAction(nameof(GetTodoListById), new { id = createdTodoList.Id }, createdTodoList);
         }
         catch (ArgumentException ex)
@@ -196,7 +196,7 @@ public class TodoListController : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing todo list for the authenticated user.
+    /// Updates an existing to-do list for the authenticated user.
     /// </summary>
     /// <param name="id">Id of user</param>
     /// <param name="todoListDto">Data transfer from Entity</param>
@@ -241,7 +241,7 @@ public class TodoListController : ControllerBase
                 "Updating todo list {TodoListId} for user {UserId}",
                 id, userId);
 
-            // Call the service to update the todo list
+            // Call the service to update the to-do list
             await _todoListService.UpdateAsync(todoListDto, userId);
 
             _logger.LogInformation(
@@ -270,7 +270,7 @@ public class TodoListController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a todo list by its ID for the authenticated user.
+    /// Deletes a to-do list by its ID for the authenticated user.
     /// </summary>
     /// <param name="id">Delete of user</param>
     /// <returns></returns>
@@ -303,7 +303,7 @@ public class TodoListController : ControllerBase
 
             _logger.LogInformation("Deleting todo list {TodoListId} for user {UserId}", id, userId);
 
-            // Call the service to delete the todo list
+            // Call the service to delete the to-do list
             await _todoListService.DeleteAsync(id, userId);
             _logger.LogInformation(
                 "Successfully deleted todo list {TodoListId} for user {UserId}",
@@ -331,9 +331,9 @@ public class TodoListController : ControllerBase
 
 
     /// <summary>
-    /// Gets all tasks for a specific todo list.
+    /// Gets all tasks for a specific to-do list.
     /// </summary>
-    /// <param name="id">Todo list ID</param>
+    /// <param name="id">To-do list ID</param>
     /// <returns>List of tasks</returns>
     [HttpGet("{id}/tasks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -391,7 +391,7 @@ public class TodoListController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new task in a specific todo list.
+    /// Creates a new task in a specific to-do list.
     /// </summary>
     [HttpPost("{id}/tasks")]
     [ProducesResponseType(typeof(TodoTaskDto), StatusCodes.Status201Created)]

@@ -29,17 +29,27 @@ public class TodoListRepository : ITodoListRepository
             .FirstOrDefaultAsync(tl => tl.Id == id);
     }
 
-    public async Task<TodoListEntity> CreateAsync(TodoListEntity todoList)
+    public Task<TodoListEntity> CreateAsync(TodoListEntity todoList)
     {
         ArgumentNullException.ThrowIfNull(todoList);
+        return CreateAsyncCore(todoList);
+    }
+
+    private async Task<TodoListEntity> CreateAsyncCore(TodoListEntity todoList)
+    {
         var entityEntry = await this._dbContext.TodoLists.AddAsync(todoList);
         _ = await this._dbContext.SaveChangesAsync();
         return entityEntry.Entity;
     }
 
-    public async Task UpdateSync(TodoListEntity todoList)
+    public Task UpdateSync(TodoListEntity todoList)
     {
         ArgumentNullException.ThrowIfNull(todoList);
+        return UpdateSyncCore(todoList);
+    }
+
+    private async Task UpdateSyncCore(TodoListEntity todoList)
+    {
         _ = this._dbContext.TodoLists.Update(todoList);
         _ = await this._dbContext.SaveChangesAsync();
     }

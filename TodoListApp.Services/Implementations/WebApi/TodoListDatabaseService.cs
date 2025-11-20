@@ -16,7 +16,7 @@ public class TodoListDatabaseService : ITodoListService
         this._todoTaskRepository = todoTaskRepository;
     }
 
-    public async Task<PagedResult<TodoListDto>> GetUserTodoListsAsync(string userId, int pageNumber, int pageSize)
+    public Task<PagedResult<TodoListDto>> GetUserTodoListsAsync(string userId, int pageNumber, int pageSize)
     {
         if (pageNumber <= 0)
         {
@@ -26,7 +26,11 @@ public class TodoListDatabaseService : ITodoListService
         {
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
+        return GetUserTodoListsAsyncCore(userId, pageNumber, pageSize);
+    }
 
+    private async Task<PagedResult<TodoListDto>> GetUserTodoListsAsyncCore(string userId, int pageNumber, int pageSize)
+    {
         var allLists = await this._todoListRepository.GetAllByOwnerIdAsync(userId);
         var pagedLists = allLists
             .Skip((pageNumber - 1) * pageSize)
@@ -41,7 +45,6 @@ public class TodoListDatabaseService : ITodoListService
                 CreatedDate = t.CreatedDate,
                 TaskCount = t.Tasks?.Count ?? 0,
             }).ToList();
-
         return new PagedResult<TodoListDto>
         {
             Items = dtoLists,
@@ -51,19 +54,22 @@ public class TodoListDatabaseService : ITodoListService
         };
     }
 
-    public async Task<TodoListDto?> GetTodoListByIdAsync(int id, string userId)
+    public Task<TodoListDto?> GetTodoListByIdAsync(int id, string userId)
     {
         if (id <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(id));
         }
-        var ownersTasks = await this._todoListRepository.GetByIdAsync(id);
+        return GetTodoListByIdAsyncCore(id, userId);
+    }
 
+    private async Task<TodoListDto?> GetTodoListByIdAsyncCore(int id, string userId)
+    {
+        var ownersTasks = await this._todoListRepository.GetByIdAsync(id);
         if (ownersTasks is null || ownersTasks.OwnerId != userId)
         {
             return null;
         }
-
         return new TodoListDto
         {
             Id = ownersTasks.Id,
@@ -73,31 +79,35 @@ public class TodoListDatabaseService : ITodoListService
             TaskCount = ownersTasks.Tasks?.Count ?? 0,
             OwnerId = userId
         };
-
     }
 
-    public async Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsync(int id, string userId)
+    public Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsync(int id, string userId)
     {
         if (id <= 0)
         {
             throw new ArgumentException("List ID must be greater than zero", nameof(id));
         }
-
         if (string.IsNullOrEmpty(userId))
         {
             throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
         }
+        return GetTasksByIdAsyncCore(id, userId);
+    }
 
+    private async Task<IEnumerable<TodoTaskDto>> GetTasksByIdAsyncCore(int id, string userId)
+    {
         var todoList = await _todoListRepository.GetByIdAsync(id);
-
         if (todoList == null)
         {
             throw new KeyNotFoundException($"Todo list with ID {id} not found");
         }
 
+        if (todoList.OwnerId != userId)
+        {
+            throw new UnauthorizedAccessException("User does not have access to this todo list");
+        }
 
         var tasks = await _todoTaskRepository.GetByListIdAsync(id);
-
         var taskDtos = tasks.Select(task => new TodoTaskDto
         {
             Id = task.Id,
@@ -109,15 +119,18 @@ public class TodoListDatabaseService : ITodoListService
             CompletedDate = task.CompletedDate,
             TodoListId = task.TodoListId
         });
-
         return taskDtos;
     }
 
-    public async Task<TodoListDto> CreateAsync(TodoListDto todoListDto, string userId)
+    public Task<TodoListDto> CreateAsync(TodoListDto todoListDto, string userId)
     {
         ArgumentNullException.ThrowIfNull(todoListDto);
         ArgumentNullException.ThrowIfNull(userId);
+        return CreateAsyncCore(todoListDto, userId);
+    }
 
+    private async Task<TodoListDto> CreateAsyncCore(TodoListDto todoListDto, string userId)
+    {
         TodoListEntity entity = new()
         {
             Title = todoListDto.Title,
@@ -125,11 +138,7 @@ public class TodoListDatabaseService : ITodoListService
             OwnerId = userId,
             CreatedDate = DateTime.UtcNow
         };
-
-
-
         var createdEntity = await this._todoListRepository.CreateAsync(entity);
-
         return new TodoListDto
         {
             Id = createdEntity.Id,
@@ -140,32 +149,38 @@ public class TodoListDatabaseService : ITodoListService
         };
     }
 
-    public async Task UpdateAsync(TodoListDto todoListDto, string userId)
+    public Task UpdateAsync(TodoListDto todoListDto, string userId)
     {
         ArgumentNullException.ThrowIfNull(todoListDto);
         ArgumentNullException.ThrowIfNull(userId);
+        return UpdateAsyncCore(todoListDto, userId);
+    }
 
+    private async Task UpdateAsyncCore(TodoListDto todoListDto, string userId)
+    {
         var isOwner = await this._todoListRepository.IsOwnerAsync(todoListDto.Id, userId);
-
         if (!isOwner)
         {
             throw new UnauthorizedAccessException("User is not the owner of the todo list.");
         }
-
         var entity = await this._todoListRepository.GetByIdAsync(todoListDto.Id);
         entity!.Title = todoListDto.Title;
         entity.Description = todoListDto.Description;
-
         await this._todoListRepository.UpdateSync(entity);
     }
 
-    public async Task DeleteAsync(int id, string userId)
+    public Task DeleteAsync(int id, string userId)
     {
         if (id <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(id));
         }
         ArgumentNullException.ThrowIfNull(userId);
+        return DeleteAsyncCore(id, userId);
+    }
+
+    private async Task DeleteAsyncCore(int id, string userId)
+    {
         var isOwner = await this._todoListRepository.IsOwnerAsync(id, userId);
         if (!isOwner)
         {

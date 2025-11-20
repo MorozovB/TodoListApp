@@ -54,7 +54,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -99,7 +99,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -132,7 +132,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -166,7 +166,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -189,7 +189,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (Exception ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 
@@ -215,7 +215,7 @@ public class TodoTaskWebApiService : ITodoTaskService
         }
         catch (JsonException ex)
         {
-            throw new Exception("Error deserializing the response", ex);
+            throw new InvalidOperationException("Error deserializing the response", ex);
         }
     }
 

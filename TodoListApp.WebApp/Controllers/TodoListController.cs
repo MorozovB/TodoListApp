@@ -376,7 +376,7 @@ public class TodoListController : Controller
         }
     }
 
-    private PagedResult<TodoListViewModel> CreateEmptyPagedResult(int pageNumber, int pageSize)
+    private static PagedResult<TodoListViewModel> CreateEmptyPagedResult(int pageNumber, int pageSize)
     {
         return new PagedResult<TodoListViewModel>
         {

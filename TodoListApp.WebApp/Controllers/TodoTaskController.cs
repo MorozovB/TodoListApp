@@ -41,7 +41,6 @@ public class TodoTaskController : Controller
                 return RedirectToAction("Index", "TodoList");
             }
 
-            // Get the todo list to display its title
             var todoListDto = await _todoListService.GetTodoListByIdAsync(taskDto.TodoListId, userId);
 
             if (todoListDto == null)
@@ -56,7 +55,7 @@ public class TodoTaskController : Controller
                 Title = taskDto.Title,
                 Description = taskDto.Description,
                 IsCompleted = taskDto.IsCompleted,
-                Priority = (int)taskDto.Priority,  // Явное преобразование enum → int
+                Priority = (int)taskDto.Priority, 
                 CreatedDate = taskDto.CreatedDate,
                 CompletedDate = taskDto.CompletedDate,
                 DueDate = taskDto.DueDate,
